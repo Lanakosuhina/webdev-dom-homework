@@ -39,27 +39,27 @@
   const likeNumber = document.querySelector(".likes-counter");
 
   const getComments = () => {
-  fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
-    method: "GET"
-  }).then((response) => {
-    response.json().then((responseData) => {
-      comments = responseData.comments.map((comment) => {
-        return {
-          name: comment.author.name,
-          date: comment.date,
-          text: comment.text,
-          likesCount: comment.likes,
-          isLiked: false,
-          isEdited: false
-        };
+    fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
+      method: "GET"
+    }).then((response) => {
+      response.json().then((responseData) => {
+        comments = responseData.comments.map((comment) => {
+          return {
+            name: comment.author.name,
+            date: comment.date,
+            text: comment.text,
+            likesCount: comment.likes,
+            isLiked: false,
+            isEdited: false
+          };
+        });
+        console.log(comments);
+        renderComments();
       });
-      console.log(comments);
-      renderComments();
     });
-  });
-}
+  }
 
-getComments();
+  getComments();
 
 
   addButton.addEventListener("click", (event) => {
@@ -68,24 +68,7 @@ getComments();
       commentInput.classList.add("error");
       return;
     }
-
-    comments.push({
-      name: nameInput.value
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;"),
-      date: current,
-      text: commentInput.value
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-        .replaceAll("QUOTE_END", "</div>"),
-      isLiked: false,
-      likesCount: 0,
-    })
+    
 
     event.stopPropagation();
     fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
@@ -189,6 +172,10 @@ getComments();
 
   }
 
+
+  // const renderLoading = () => {
+  //   const Loading
+  // }
   const likeComment = (index) => {
 
     const comment = comments[index];
@@ -268,13 +255,12 @@ getComments();
   const deleteButtonsListeners = () => {
     deleteButton.addEventListener("click", () => {
       const lastCommentIndex = comments.length - 1;
-      console.log(lastCommentIndex);
-  comments.splice(lastCommentIndex, 1);
-      renderStudents();
+      comments.splice(lastCommentIndex, 1);
+      renderComments();
     });
   }
 
-   deleteButtonsListeners();
+  deleteButtonsListeners();
   // отключение кнопки
 
   nameInput.addEventListener('input', () => {
