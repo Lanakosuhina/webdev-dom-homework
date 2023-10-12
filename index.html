@@ -38,7 +38,7 @@
   const current = new Date().toLocaleString();
   const likeNumber = document.querySelector(".likes-counter");
 
-
+  const getComments = () => {
   fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
     method: "GET"
   }).then((response) => {
@@ -57,11 +57,35 @@
       renderComments();
     });
   });
+}
 
+getComments();
 
 
   addButton.addEventListener("click", (event) => {
-    errorSolving();
+    if (nameInput.value === "" && commentInput.value === "") {
+      nameInput.classList.add("error");
+      commentInput.classList.add("error");
+      return;
+    }
+
+    comments.push({
+      name: nameInput.value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;"),
+      date: current,
+      text: commentInput.value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+        .replaceAll("QUOTE_END", "</div>"),
+      isLiked: false,
+      likesCount: 0,
+    })
 
     event.stopPropagation();
     fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
@@ -76,7 +100,7 @@
           commentInput.value
       })
     });
-
+    getComments();
     renderComments();
   });
 
@@ -250,7 +274,7 @@
     });
   }
 
-  deleteButtonsListeners();
+   deleteButtonsListeners();
   // отключение кнопки
 
   nameInput.addEventListener('input', () => {
