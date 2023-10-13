@@ -11,6 +11,10 @@
     <ul class="tasks" id="list">
         <!-- Список рендерится из JS -->
     </ul>
+    <h2 id="names">Список фамилий</h2>
+    <ul class="surnames" id="second-list">
+        <!-- Список рендерится из JS -->
+    </ul>
     <br />
     <div class="form">
         <h3 class="form-title">Форма добавления</h3>
@@ -22,7 +26,7 @@
         <button class="button" id="add-button">Добавить</button>
         <div class="form-fam">
             Введите вашу фамилию:
-            <input type="text" id="text-input" class="input" placeholder="Иванова" />
+            <input type="text" id="name-input" class="input" placeholder="Иванова" />
         </div>
         <br />
         <button class="button" id="fam-button">Сохранить фамилию</button>
@@ -34,6 +38,7 @@
     const buttonElement = document.getElementById("add-button");
     const listElement = document.getElementById("list");
     const textInputElement = document.getElementById("text-input");
+    const nameInputElement = document.getElementById("name-input")
 
     // Запросы в API - асинхронные, мы не знаем как долго будет выполняться запрос
     // Запрос может выполняться секунды и даже минуты
@@ -68,52 +73,6 @@
 
         })
     });
-
-
-
-    const buttonSurname = document.getElementById("fam-button");
-
-    fetch("https://webdev-hw-api.vercel.app/api/tasks/string", {
-        method: "GET"
-    });
-
-    fetchColor.then((res) => {
-        const jsonColor = res.json();
-        jsonColor.then((resData) => {
-
-            const body = document.getElementById("body");
-            body.style.backgroundColor = resData.color;
-
-        })
-    });
-
-    buttonSurname.addEventListener("click", (event) => {
-        if (textInputElement.value === "") {
-            return;
-        }
-        event.stopPropagation();
-        fetch("https://webdev-hw-api.vercel.app/api/tasks/string", {
-            method: "POST",
-            body: JSON.stringify({
-                text: textInputElement.value
-        })
-        }).then((response) => {
-            response.json().then((responseData) => {
-                textInputElement.value
-            })
-        })
-
-        renderTasks();
-
-        textInputElement.value = "";
-    });
-
-
-
-    // При клике на кнопку сделайте POST-запрос к указанному API, в строке передайте в API введенную фамилию.
-    // Откройте GET API в браузере и убедитесь, что выводится введенная фамилия.
-    // Поэкспериментируйте с POST API, попробуйте передать в поле string не строку, 
-    // а, например, число. Посмотрите, что ответит на такой запрос сервер.
 
 
     // TODO: Получать из хранилища данных
@@ -201,6 +160,124 @@
         textInputElement.value = "";
     });
 
+
+    const buttonSurname = document.getElementById("fam-button");
+
+    const getSurname = () => {
+
+        fetch("https://webdev-hw-api.vercel.app/api/tasks/string", {
+            method: "GET"
+        }).then((res) => {
+            res.json().then((resData) => {
+                surs = resData.surs.map((sur) => {
+                    return {
+                        name: surs.name
+                    };
+                });
+                renderSurs();
+            });
+        });
+    }
+    
+    getSurname();
+ 
+// c помощью функции fetch делается запрос в api, функция принимает его адрес и его параметры,
+//  точнее метод get, а возвращает promise
+// c помощью then мы подписываемся на успешное завершение промиса
+// получаем ответ в объекте response (там находятся сырые данные, преобразовываем их из json в js)
+// получаем результат и подписываемся снова через then
+// обращаемся к массиву и вкладываем туда полученный результат, рендерим список задач
+
+    buttonSurname.addEventListener("click", (event) => {
+        if (nameInputElement.value === "") {
+            return;
+        }
+        event.stopPropagation();
+
+        fetch("https://webdev-hw-api.vercel.app/api/tasks/string", {
+            method: "POST",
+            body: JSON.stringify({
+                name: nameInputElement.value
+            })
+        }).then((response) => {
+            response.json().then((responseData) => {
+                nameInputElement.value
+            })
+        })
+        getSurname();
+        renderSurs();
+    });
+
+// создаем обработчик события клика на кнопку, далее происходит проверка, если поле ввода пустое, то функция ничего не делает
+// если поле не пустое, то происходит отправка post на сервер по адресу
+// в теле запроса передается объект со значением из поля ввода,
+// JSON.stringify преобразует его в нужный формат, в строку
+// далее подписываемся на ответ и приводим к js, снова подписываемся через then
+// обновленный список задач в поле todos, кладем его в локальный state 
+// вызывается функция рендер и очищается поле ввода 
+
+
+    const doubleListElement = document.getElementById("second-list");
+
+    let surs = [
+        {
+            name: "Косухина"
+        },
+    ];
+
+    const renderSurs = () => {
+        const sursHtml = surs
+            .map((sur, index) => {
+                return `<li class="sur">
+                    <p class="task-text">
+                    ${sur.name}
+                    <button data-index="${index}" class="button delete-button">Удалить</button>
+                    </p>
+                </li>`;
+            })
+            .join("");
+console.log(sursHtml);
+        doubleListElement.innerHTML = sursHtml
+        const deleteButtons = document.querySelectorAll(".delete-button");
+
+        for (const deleteButton of deleteButtons) {
+            deleteButton.addEventListener("click", (event) => {
+                event.stopPropagation();
+
+                deleteButton.innerHTML = 'Задача удаляется...'
+
+                const index = deleteButton.dataset.index;
+                const deleteSurname = surs.splice(index, 1)
+
+                setTimeout(() => {
+
+                    deleteSurname;
+                    renderSurs();
+                }, 1000)
+
+            });
+        }
+    }
+    renderSurs();
+
+
+    buttonElement.addEventListener("click", () => {
+        if (nameInputElement.value === "") {
+            return;
+        }
+
+        surs.push({
+            name: nameInputElement.value
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+        });
+
+        renderSurs();
+
+        nameInputElement.value = "";
+    });
 
 </script>
 

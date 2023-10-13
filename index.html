@@ -46,7 +46,8 @@
         comments = responseData.comments.map((comment) => {
           return {
             name: comment.author.name,
-            date: comment.date,
+            date: new Date().toLocaleString('ru-RU', { year: "2-digit", month: "2-digit",
+            day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).replace(',', ''),
             text: comment.text,
             likesCount: comment.likes,
             isLiked: false,
@@ -68,7 +69,7 @@
       commentInput.classList.add("error");
       return;
     }
-    
+
 
     event.stopPropagation();
     fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
