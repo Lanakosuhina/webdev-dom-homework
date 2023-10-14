@@ -64,13 +64,13 @@
 
 
   addButton.addEventListener("click", (event) => {
-    if (nameInput.value === "" && commentInput.value === "") {
-      nameInput.classList.add("error");
-      commentInput.classList.add("error");
-      return;
-    }
-
-
+// if (nameInput.value === "" && commentInput.value === "") {
+//       nameInput.classList.add("error");
+//       commentInput.classList.add("error");
+//       return;
+//     }
+validateInputs();
+  
     event.stopPropagation();
     fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
       method: "POST",
@@ -204,52 +204,76 @@
     }
   }
 
+  function validateInputs() {
+  let isValid = true;
+  
+  if (!nameInput.value) {
+    nameInput.classList.add('error');
+    isValid = false;
+  } else {
+    nameInput.classList.remove('error');
+  }
+  
+  if (!commentInput.value) {
+    commentInput.classList.add('error');
+    isValid = false;
+  } else {
+    commentInput.classList.remove('error');
+  }
+  
+  addButton.disabled = !isValid;
+  nameInput.value = "";
+  commentInput.value = "";
+}
+
+nameInput.addEventListener('input', validateInputs);
+commentInput.addEventListener('input', validateInputs);
 
   // вызов рендер функции
 
   renderComments();
 
   addButton.addEventListener("click", () => {
-    errorSolving();
+    // errorSolving();
   });
 
   addButton.addEventListener('keyup', function (event) {
     if (event.which === 13) {
-      errorSolving();
+      // errorSolving();
     }
   });
 
   // появление красных полей, если они пустые 
 
-  function errorSolving() {
-    if (nameInput.value === "" && commentInput.value === "") {
-      nameInput.classList.add("error");
-      commentInput.classList.add("error");
-      return;
-    }
+  // function errorSolving() {
+  //   if (nameInput.value === "" && commentInput.value === "") {
+  //     nameInput.classList.add("error");
+  //     commentInput.classList.add("error");
+  //    return;
+  //   }
+   
+  //   comments.push({
+  //     name: nameInput.value
+  //       .replaceAll("&", "&amp;")
+  //       .replaceAll("<", "&lt;")
+  //       .replaceAll(">", "&gt;")
+  //       .replaceAll('"', "&quot;"),
+  //     date: current,
+  //     text: commentInput.value
+  //       .replaceAll("&", "&amp;")
+  //       .replaceAll("<", "&lt;")
+  //       .replaceAll(">", "&gt;")
+  //       .replaceAll('"', "&quot;")
+  //       .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+  //       .replaceAll("QUOTE_END", "</div>"),
+  //     isLiked: false,
+  //     likesCount: 0,
+  //   })
+  //   renderComments();
 
-    comments.push({
-      name: nameInput.value
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;"),
-      date: current,
-      text: commentInput.value
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-        .replaceAll("QUOTE_END", "</div>"),
-      isLiked: false,
-      likesCount: 0,
-    })
-    renderComments();
-
-    nameInput.value = "";
-    commentInput.value = "";
-  }
+  //   nameInput.value = "";
+  //   commentInput.value = "";
+  //   }
 
 
 
@@ -264,24 +288,24 @@
   deleteButtonsListeners();
   // отключение кнопки
 
-  nameInput.addEventListener('input', () => {
-    turnOnOff();
-  });
+  // nameInput.addEventListener('input', () => {
+  //   turnOnOff();
+  // });
 
-  commentInput.addEventListener('input', () => {
-    turnOnOff();
-  });
+  // commentInput.addEventListener('input', () => {
+  //   turnOnOff();
+  // });
 
-  function turnOnOff() {
-    let username = nameInput.value;
-    let comment = commentInput.value;
+  // function turnOnOff() {
+  //   let username = nameInput.value;
+  //   let comment = commentInput.value;
 
-    if (username && comment) {
-      document.querySelector(".add-form-button").disabled = false;
-    } else {
-      document.querySelector(".add-form-button").disabled = true;
-    }
-  }
+  //   if (username && comment) {
+  //     document.querySelector(".add-form-button").disabled = false;
+  //   } else {
+  //     document.querySelector(".add-form-button").disabled = true;
+  //   }
+  // }
   console.log("It works!");
 </script>
 
