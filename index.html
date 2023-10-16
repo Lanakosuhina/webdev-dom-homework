@@ -8,111 +8,122 @@
 </head>
 
 <body>
+  <div class="mask">
+    <div class="comments-loading"></div>
+    <p class="loader">Пожалуйста подождите, комментарии загружаются...</p>
+  </div>
+
   <div class="container">
     <ul id="comments" class="comments">
-      <!-- Cписок рендерится из js -->
+      <!-- Список рендерится из js -->
     </ul>
 
     <div class="add-form">
       <input type="text" class="add-form-name" placeholder="Введите ваше имя" />
-      <textarea type="textarea" class="add-form-text" placeholder="Введите ваш коментарий" rows="4"></textarea>
+      <textarea type="textarea" class="add-form-text" placeholder="Введите ваш комментарий" rows="4"></textarea>
       <div class="add-form-row">
         <button class="add-form-button" disabled>Написать</button>
-
       </div>
     </div>
+
     <button class="delete-form-button">Удалить последний комментарий</button>
-
   </div>
-</body>
 
-<script>
-  "use strict";
 
-  let nameInput = document.querySelector(".add-form-name");
-  let commentInput = document.querySelector(".add-form-text");
-  let commentSection = document.querySelector(".comments");
-  let addButton = document.querySelector(".add-form-button");
-  const deleteButton = document.querySelector(".delete-form-button");
-  const newComment = document.querySelector(".comment-header");
-  const current = new Date().toLocaleString();
-  const likeNumber = document.querySelector(".likes-counter");
 
-  const getComments = () => {
-    fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
-      method: "GET"
-    }).then((response) => {
-      response.json().then((responseData) => {
-        comments = responseData.comments.map((comment) => {
-          return {
-            name: comment.author.name,
-            date: new Date().toLocaleString('ru-RU', { year: "2-digit", month: "2-digit",
-            day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).replace(',', ''),
-            text: comment.text,
-            likesCount: comment.likes,
-            isLiked: false,
-            isEdited: false
-          };
+  <script>
+    "use strict";
+
+    let nameInput = document.querySelector(".add-form-name");
+    let commentInput = document.querySelector(".add-form-text");
+    let commentSection = document.querySelector(".comments");
+    let addButton = document.querySelector(".add-form-button");
+    const deleteButton = document.querySelector(".delete-form-button");
+    const newComment = document.querySelector(".comment-header");
+    const current = new Date().toLocaleString();
+    const likeNumber = document.querySelector(".likes-counter");
+    const addLoader = document.querySelector(".mask");
+
+
+    addLoader.style.display = 'blok';
+    document.body.style.overflow = 'hidden';
+
+    const getComments = () => {
+
+      fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
+        method: "GET"
+      })
+        .then((response) => {
+          return response.json()
+        })
+        .then((responseData) => {
+          comments = responseData.comments.map((comment) => {
+            return {
+              name: comment.author.name,
+              date: new Date(comment.date).toLocaleString('ru-RU', {
+                year: "2-digit", month: "2-digit",
+                day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false
+              }).replace(',', ''),
+              text: comment.text,
+              likesCount: comment.likes,
+              isLiked: false,
+              isEdited: false
+            };
+          });
+          console.log(comments);
+          renderComments();
+          addLoader.style.display = 'none';
+          document.body.style.overflow = 'visible';
         });
-        console.log(comments);
-        renderComments();
-      });
-    });
-  }
-
-  getComments();
-
-
-  addButton.addEventListener("click", (event) => {
-// if (nameInput.value === "" && commentInput.value === "") {
-//       nameInput.classList.add("error");
-//       commentInput.classList.add("error");
-//       return;
-//     }
-validateInputs();
-  
-    event.stopPropagation();
-    fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
-      method: "POST",
-      body: JSON.stringify({
-        name: nameInput.value,
-        text: commentInput.value
-      })
-    }).then((response) => {
-      response.json().then((responseData) => {
-        nameInput.value,
-          commentInput.value
-      })
-    });
-    getComments();
-    renderComments();
-  });
-
-
-
-  let comments = [
-    {
-      name: "Глеб Фокин",
-      date: "12.02.22 12:18",
-      text: "Это будет первый комментарий на этой странице",
-      likesCount: 3,
-      isLiked: false,
-      isEdited: false
-    },
-    {
-      name: "Варвара Н.",
-      date: "13.02.22 19:22",
-      text: "Мне нравится как оформлена эта страница! ❤",
-      likesCount: 75,
-      isLiked: false,
-      isEdited: false
     }
-  ]
 
-  const renderComments = () => {
-    const commentsHtml = comments
-      .map((comment, index) => {
-        return `<li class="comment" id="comment" data-index="${index}">
+    getComments();
+
+    addButton.addEventListener("click", (event) => {
+      if (nameInput.value === "" && commentInput.value === "") {
+        nameInput.classList.add("error");
+        commentInput.classList.add("error");
+        return;
+      }
+      addButton.disabled = true;
+      addButton.textContent = 'Комментарий добавляется...';
+
+      event.stopPropagation();
+      fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
+        method: "POST",
+        body: JSON.stringify({
+          name: nameInput.value,
+          text: commentInput.value
+        })
+      })
+        .then((response) => {
+          return response.json()
+        })
+        .then((responseData) => {
+          return [nameInput.value, commentInput.value]
+        })
+        .then(() => {
+          addButton.disabled = false;
+          addButton.textContent = 'Написать'
+        })
+        .then(() => {
+          nameInput.value = "";
+          commentInput.value = "";
+        })
+      getComments();
+      renderComments();
+
+    });
+
+
+
+
+    let comments = []
+
+    const renderComments = () => {
+      const commentsHtml = comments
+        .map((comment, index) => {
+          return `<li class="comment" id="comment" data-index="${index}">
           <div class="comment-header">
             <div>${comment.name}</div>
             <div>${comment.date}</div>
@@ -128,185 +139,151 @@ validateInputs();
             </div>
           </div>
         </li>`
-      })
-      .join('');
-
-    commentSection.innerHTML = commentsHtml;
-    // кнопка лайка
-
-    const likeButtons = document.querySelectorAll('.like-button');
-
-    likeButtons.forEach((likeButton, index) => {
-      likeButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        likeComment(index);
-        renderComments();
-      });
-    });
-
-
-    const answerCommentListener = () => {
-      const commentsElement = document.querySelectorAll(".comment");
-      for (const commentElement of commentsElement) {
-        commentElement.addEventListener("click", () => {
-          const index = commentElement.dataset.index;
-          if (comments[index].isEdited) return; // запрещаем ответ на комментарий, то что ниже отключается 
-          let commentInput = document.querySelector(".add-form-text");
-          commentInput.value = `QUOTE_BEGIN ${comments[index].name}: \n ${comments[index].text} QUOTE_END`;
-          renderComments();
         })
+        .join('');
+
+      commentSection.innerHTML = commentsHtml;
+
+      const likeButtons = document.querySelectorAll('.like-button');
+
+      likeButtons.forEach((likeButton, index) => {
+        likeButton.addEventListener('click', (event) => {
+          event.stopPropagation();
+          likeComment(index);
+          renderComments();
+        });
+      });
+
+
+      const answerCommentListener = () => {
+        const commentsElement = document.querySelectorAll(".comment");
+        for (const commentElement of commentsElement) {
+          commentElement.addEventListener("click", () => {
+            const index = commentElement.dataset.index;
+            if (comments[index].isEdited) return;
+            let commentInput = document.querySelector(".add-form-text");
+            commentInput.value = `QUOTE_BEGIN ${comments[index].name}: \n ${comments[index].text} QUOTE_END`;
+            renderComments();
+          })
+        }
+
+      };
+      answerCommentListener();
+
+
+      const editButtonList = document.querySelectorAll('.edit-button');
+
+      editButtonList.forEach((editButton, index) => {
+        editButton.addEventListener('click', (event) => {
+          event.stopPropagation();
+          editComment(index);
+          renderComments();
+        });
+      });
+
+    }
+
+
+    const likeComment = (index) => {
+
+      const comment = comments[index];
+
+      if (comment.isLiked) {
+        comment.likesCount--;
+        comment.isLiked = false;
+      } else {
+        comment.likesCount++;
+        comment.isLiked = true;
       }
+    }
 
-    };
-    answerCommentListener();
+    const editComment = (index) => {
+
+      const comment = comments[index];
+
+      if (comment.isEdited) {
+        const newText = document.getElementById(`textarea-${index}`).value;
+        comment.text = newText;
+        comment.isEdited = false;
+      } else {
+
+        comment.isEdited = true;
+      }
+    }
 
 
-    const editButtonList = document.querySelectorAll('.edit-button');
+    renderComments();
 
-    editButtonList.forEach((editButton, index) => {
-      editButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        editComment(index);
+    //  
+
+    addButton.addEventListener("click", () => {
+
+    });
+
+    addButton.addEventListener('keyup', function (event) {
+      if (event.which === 13) {
+
+      }
+    });
+
+    //   function errorSolving() {
+
+    //     comments.push({
+    //       name: nameInput.value
+    //         .replaceAll("&", "&amp;")
+    //         .replaceAll("<", "&lt;")
+    //         .replaceAll(">", "&gt;")
+    //         .replaceAll('"', "&quot;"),
+    //       date: current,
+    //       text: commentInput.value
+    //         .replaceAll("&", "&amp;")
+    //         .replaceAll("<", "&lt;")
+    //         .replaceAll(">", "&gt;")
+    //         .replaceAll('"', "&quot;")
+    //         .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+    //         .replaceAll("QUOTE_END", "</div>"),
+    //       isLiked: false,
+    //       likesCount: 0,
+    //     })
+    //     renderComments();
+
+    //     nameInput.value = "";
+    //     commentInput.value = "";
+    //   }
+
+
+    // УДАЛЕНИЕ ПОСЛЕДНЕГО КОММЕНТАРИЯ 
+    const deleteButtonsListeners = () => {
+      deleteButton.addEventListener("click", () => {
+        const lastCommentIndex = comments.length - 1;
+        comments.splice(lastCommentIndex, 1);
         renderComments();
       });
+    }
+
+    deleteButtonsListeners();
+
+    //   ОТКЛЮЧЕНИЕ КНОПКИ
+
+    nameInput.addEventListener('input', () => {
+      turnOnOff();
     });
 
-  }
-
-
-  // const renderLoading = () => {
-  //   const Loading
-  // }
-  const likeComment = (index) => {
-
-    const comment = comments[index];
-
-    if (comment.isLiked) {
-      comment.likesCount--;
-      comment.isLiked = false;
-    } else {
-      comment.likesCount++;
-      comment.isLiked = true;
-    }
-  }
-
-  const editComment = (index) => {
-
-    const comment = comments[index];
-
-    if (comment.isEdited) {
-      const newText = document.getElementById(`textarea-${index}`).value;
-      comment.text = newText;
-      comment.isEdited = false;
-    } else {
-
-      comment.isEdited = true;
-    }
-  }
-
-  function validateInputs() {
-  let isValid = true;
-  
-  if (!nameInput.value) {
-    nameInput.classList.add('error');
-    isValid = false;
-  } else {
-    nameInput.classList.remove('error');
-  }
-  
-  if (!commentInput.value) {
-    commentInput.classList.add('error');
-    isValid = false;
-  } else {
-    commentInput.classList.remove('error');
-  }
-  
-  addButton.disabled = !isValid;
-  nameInput.value = "";
-  commentInput.value = "";
-}
-
-nameInput.addEventListener('input', validateInputs);
-commentInput.addEventListener('input', validateInputs);
-
-  // вызов рендер функции
-
-  renderComments();
-
-  addButton.addEventListener("click", () => {
-    // errorSolving();
-  });
-
-  addButton.addEventListener('keyup', function (event) {
-    if (event.which === 13) {
-      // errorSolving();
-    }
-  });
-
-  // появление красных полей, если они пустые 
-
-  // function errorSolving() {
-  //   if (nameInput.value === "" && commentInput.value === "") {
-  //     nameInput.classList.add("error");
-  //     commentInput.classList.add("error");
-  //    return;
-  //   }
-   
-  //   comments.push({
-  //     name: nameInput.value
-  //       .replaceAll("&", "&amp;")
-  //       .replaceAll("<", "&lt;")
-  //       .replaceAll(">", "&gt;")
-  //       .replaceAll('"', "&quot;"),
-  //     date: current,
-  //     text: commentInput.value
-  //       .replaceAll("&", "&amp;")
-  //       .replaceAll("<", "&lt;")
-  //       .replaceAll(">", "&gt;")
-  //       .replaceAll('"', "&quot;")
-  //       .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-  //       .replaceAll("QUOTE_END", "</div>"),
-  //     isLiked: false,
-  //     likesCount: 0,
-  //   })
-  //   renderComments();
-
-  //   nameInput.value = "";
-  //   commentInput.value = "";
-  //   }
-
-
-
-  const deleteButtonsListeners = () => {
-    deleteButton.addEventListener("click", () => {
-      const lastCommentIndex = comments.length - 1;
-      comments.splice(lastCommentIndex, 1);
-      renderComments();
+    commentInput.addEventListener('input', () => {
+      turnOnOff();
     });
-  }
 
-  deleteButtonsListeners();
-  // отключение кнопки
+    function turnOnOff() {
+      let username = nameInput.value;
+      let comment = commentInput.value;
 
-  // nameInput.addEventListener('input', () => {
-  //   turnOnOff();
-  // });
-
-  // commentInput.addEventListener('input', () => {
-  //   turnOnOff();
-  // });
-
-  // function turnOnOff() {
-  //   let username = nameInput.value;
-  //   let comment = commentInput.value;
-
-  //   if (username && comment) {
-  //     document.querySelector(".add-form-button").disabled = false;
-  //   } else {
-  //     document.querySelector(".add-form-button").disabled = true;
-  //   }
-  // }
-  console.log("It works!");
-</script>
+      if (username && comment) {
+        document.querySelector(".add-form-button").disabled = false;
+      } else {
+        document.querySelector(".add-form-button").disabled = true;
+      }
+    }
+    console.log("It works!");
+  </script>
 
 </html>

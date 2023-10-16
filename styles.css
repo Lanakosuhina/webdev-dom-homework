@@ -149,6 +149,31 @@ body {
   .error {
     background-color: red;
   }
+  .hidden{
+    display: none;
+  }
+  
+.mask {
+  height: 10%;
+  width: 100%;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.comments-loading {
+  content:url(292.gif);
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader {
+  color: white;
+  font-size: 24px;
+  font-family: Helvetica;
+}
 
   .delete-form-button {
     margin-top: 24px;
