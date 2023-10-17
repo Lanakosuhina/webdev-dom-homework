@@ -9,8 +9,8 @@
 
 <body>
   <div class="mask">
-    <div class="comments-loading"></div>
     <p class="loader">Пожалуйста подождите, комментарии загружаются...</p>
+    <div class="comments-loading"></div>
   </div>
 
   <div class="container">
@@ -67,7 +67,8 @@
               text: comment.text,
               likesCount: comment.likes,
               isLiked: false,
-              isEdited: false
+              isEdited: false,
+              isLikeLoading: false
             };
           });
           console.log(comments);
@@ -116,7 +117,8 @@
     });
 
 
-
+    // ФУНКЦИЯ-РЕНДЕР КОММЕНТАРИЯ
+    // Пустой массив заполняем новыми комментариями по шаблону
 
     let comments = []
 
@@ -144,23 +146,28 @@
 
       commentSection.innerHTML = commentsHtml;
 
+      //  ВНУТРИ. Oбработчик события на кнопку лайка  
+
       const likeButtons = document.querySelectorAll('.like-button');
 
       likeButtons.forEach((likeButton, index) => {
         likeButton.addEventListener('click', (event) => {
-          event.stopPropagation();
-          likeComment(index);
+          event.stopPropagation(); // Чтобы не срабатывали одновременно другие функции
+          likeComment(index); // Вызов функции с лайками
           renderComments();
         });
       });
 
+      // ФУНКЦИЯ ОТВЕТА НА КОММЕНТАРИЙ И ЕЕ ВЫЗОВ
 
       const answerCommentListener = () => {
         const commentsElement = document.querySelectorAll(".comment");
+
         for (const commentElement of commentsElement) {
           commentElement.addEventListener("click", () => {
             const index = commentElement.dataset.index;
             if (comments[index].isEdited) return;
+
             let commentInput = document.querySelector(".add-form-text");
             commentInput.value = `QUOTE_BEGIN ${comments[index].name}: \n ${comments[index].text} QUOTE_END`;
             renderComments();
@@ -168,8 +175,10 @@
         }
 
       };
+
       answerCommentListener();
 
+      // ВНУТРИ. Oбработчик события на кнопку редактирования  
 
       const editButtonList = document.querySelectorAll('.edit-button');
 
@@ -183,11 +192,36 @@
 
     }
 
+    function delay(interval = 300) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, interval);
+      });
+    }
+
+    // ФУНКЦИЯ ДЛЯ ДОБАВЛЕНИЯ ЛАЙКА 
+
+    // delay(2000).then(() => {
+    //     comment.likes = comment.isLiked
+    //       ? comment.likes - 1
+    //       : comment.likes + 1;
+    //     comment.isLiked = !comment.isLiked;
+    //     comment.isLikeLoading = false;
+       
+    //   })
 
     const likeComment = (index) => {
-
       const comment = comments[index];
 
+        comment.likes = comment.isLiked
+          ? comment.likes - 1
+          : comment.likes + 1;
+        comment.isLiked = !comment.isLiked;
+        comment.isLikeLoading = false;
+      
+
+     
       if (comment.isLiked) {
         comment.likesCount--;
         comment.isLiked = false;
@@ -196,6 +230,9 @@
         comment.isLiked = true;
       }
     }
+
+
+    // ФУНКЦИЯ РЕДАКТИРОВАНИЯ КОММЕНТАРИЯ
 
     const editComment = (index) => {
 
@@ -214,7 +251,7 @@
 
     renderComments();
 
-    //  
+    //  ОТПРАВЛЕНИЕ ПО КЛИКУ И ПРИ НАЖАТИИ НА ENTER (только пока не понятно чего)
 
     addButton.addEventListener("click", () => {
 
@@ -252,7 +289,7 @@
     //   }
 
 
-    // УДАЛЕНИЕ ПОСЛЕДНЕГО КОММЕНТАРИЯ 
+    // УДАЛЕНИЕ ПОСЛЕДНЕГО КОММЕНТАРИЯ И ОБРАБОТЧИК СОБЫТИЯ
     const deleteButtonsListeners = () => {
       deleteButton.addEventListener("click", () => {
         const lastCommentIndex = comments.length - 1;
@@ -263,7 +300,7 @@
 
     deleteButtonsListeners();
 
-    //   ОТКЛЮЧЕНИЕ КНОПКИ
+    //  ФУНКЦИЯ ОТКЛЮЧЕНИЯ КНОПКИ И ОБРАБОТЧИК СОБЫТИЯ НА INPUTы
 
     nameInput.addEventListener('input', () => {
       turnOnOff();

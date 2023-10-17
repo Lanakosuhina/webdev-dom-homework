@@ -99,12 +99,11 @@ body {
     border-radius: 16px;
     cursor: pointer;
     margin-right: 25px;
-
   }
 
   .add-form {
     padding: 20px;
-    margin-top: 48px;
+    margin-top: 90px;
     display: flex;
     flex-direction: column;
   }
@@ -157,12 +156,16 @@ body {
   height: 10%;
   width: 100%;
   position: fixed;
+  z-index: 1;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 60px;
+ 
 }
 .comments-loading {
-  content:url(292.gif);
+  margin-top: 50px;
+  content:url(loader-bar.gif);
   position: fixed;
   display: flex;
   justify-content: center;
@@ -170,10 +173,31 @@ body {
 }
 
 .loader {
+  margin-bottom: 90px;
   color: white;
-  font-size: 24px;
+  font-size: 22px;
   font-family: Helvetica;
 }
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(30deg);;
+  }
+  75% {
+    transform: rotate(-30deg);;
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.-loading-like {
+  animation: rotating 2s linear infinite;
+}
+
 
   .delete-form-button {
     margin-top: 24px;
