@@ -93,8 +93,8 @@
       fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
         method: "POST",
         body: JSON.stringify({
-          name: nameInput.value,
-          text: commentInput.value
+          name: sanitizeHtml(nameInput.value),
+          text: sanitizeHtml(commentInput.value),
         })
       })
         .then((response) => {
@@ -110,8 +110,11 @@
         .then(() => {
           nameInput.value = "";
           commentInput.value = "";
+                  })
+        .then(() => {
+          getComments();
         })
-      getComments();
+
       renderComments();
 
     });
@@ -136,8 +139,8 @@
           <div class="comment-footer">
             <button class="edit-button">${comment.isEdited ? 'Сохранить' : 'Редактировать'}</button>
             <div class="likes">
-              <span class="likes-counter">${comment.likesCount}</span>
-              <button class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>
+                            <span class="likes-counter">${comment.likesCount}</span>
+              <button class="like-button ${comment.isLiked ? '-active-like' : ''} ${comment.isLikeLoading ? '-loading-like' : ''}"></button>
             </div>
           </div>
         </li>`
@@ -146,112 +149,119 @@
 
       commentSection.innerHTML = commentsHtml;
 
-      //  ВНУТРИ. Oбработчик события на кнопку лайка  
 
-      const likeButtons = document.querySelectorAll('.like-button');
-
-      likeButtons.forEach((likeButton, index) => {
-        likeButton.addEventListener('click', (event) => {
-          event.stopPropagation(); // Чтобы не срабатывали одновременно другие функции
-          likeComment(index); // Вызов функции с лайками
-          renderComments();
-        });
-      });
-
-      // ФУНКЦИЯ ОТВЕТА НА КОММЕНТАРИЙ И ЕЕ ВЫЗОВ
-
-      const answerCommentListener = () => {
-        const commentsElement = document.querySelectorAll(".comment");
-
-        for (const commentElement of commentsElement) {
-          commentElement.addEventListener("click", () => {
-            const index = commentElement.dataset.index;
-            if (comments[index].isEdited) return;
-
-            let commentInput = document.querySelector(".add-form-text");
-            commentInput.value = `QUOTE_BEGIN ${comments[index].name}: \n ${comments[index].text} QUOTE_END`;
-            renderComments();
-          })
-        }
-
-      };
-
+      likeComment();     
       answerCommentListener();
+      editComment();    
 
-      // ВНУТРИ. Oбработчик события на кнопку редактирования  
+    }
 
+    // ФУНКЦИЯ ДЛЯ ДОБАВЛЕНИЯ ЛАЙКА 
+
+
+    function delay(interval = 300) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, interval);
+    });
+  }
+
+    const likeComment = () => { 
+      const likeButtons = document.querySelectorAll('.like-button'); // находим кнопки лайков 
+      likeButtons.forEach((likeButton, index) => {  
+        likeButton.addEventListener('click', (event) => { 
+          event.stopPropagation(); // Чтобы не срабатывали одновременно другие функции 
+ 
+          if (comments[index].isLikeLoading) return; // если уже идет загрузка, то ничего не делаем
+ 
+          comments[index].isLikeLoading = true; // устанавливаем флаг загрузки
+ 
+          delay(2000).then(() => { // имитируем задержку загрузки
+            const comment = comments[index];
+            comment.likes = comment.isLiked 
+            ? comment.likes - 1 
+            : comment.likes + 1; // изменяем количество лайков
+            comment.isLiked = !comment.isLiked; // меняем флаг лайка
+            comment.isLikeLoading = false; // снимаем флаг загрузки
+            renderComments(); // перерисовываем комментарии
+          }); 
+ 
+          const comment = comments[index];
+          if (comment.isLiked) { // если уже лайкнули, то убираем лайк
+            comment.likesCount--;
+            comment.isLiked = false;
+          } else { // иначе добавляем лайк
+            if (comment.likesCount === 0) 
+            comment.likesCount++; // если лайков не было, то увеличиваем счетчик
+            comment.isLiked = true;
+          } 
+          renderComments(); // перерисовываем комментарии
+        }); 
+      }); 
+    } 
+
+    // ФУНКЦИЯ ОТВЕТА НА КОММЕНТАРИЙ И ЕЕ ВЫЗОВ
+    const answerCommentListener = () => {
+      const commentsElement = document.querySelectorAll(".comment");
+
+      for (const commentElement of commentsElement) {
+        commentElement.addEventListener("click", () => {
+          const index = commentElement.dataset.index;
+          if (comments[index].isEdited) return;
+
+          let commentInput = document.querySelector(".add-form-text");
+          commentInput.value = `QUOTE_BEGIN ${comments[index].name}: \n ${comments[index].text} QUOTE_END`;
+          renderComments();
+        })
+      }
+    }
+
+    // ФУНКЦИЯ ЗАМЕНЫ СИМВОЛОВ
+
+    const sanitizeHtml = (htmlString) => {
+      return htmlString
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
+        .replaceAll("QUOTE_END", "</div>")
+    };
+
+
+    // ФУНКЦИЯ РЕДАКТИРОВАНИЯ КОММЕНТАРИЯ
+
+    const editComment = () => {
       const editButtonList = document.querySelectorAll('.edit-button');
 
       editButtonList.forEach((editButton, index) => {
         editButton.addEventListener('click', (event) => {
           event.stopPropagation();
-          editComment(index);
+
+          const comment = comments[index];
+          const newText = document.getElementById(`textarea - ${index}`).value;
+
+          if (comment.isEdited) {
+            comment.text = newText;
+            comment.isEdited = false;
+          } else {
+            comment.isEdited = true;
+          }
+
           renderComments();
         });
       });
-
-    }
-
-    function delay(interval = 300) {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, interval);
-      });
-    }
-
-    // ФУНКЦИЯ ДЛЯ ДОБАВЛЕНИЯ ЛАЙКА 
-
-    // delay(2000).then(() => {
-    //     comment.likes = comment.isLiked
-    //       ? comment.likes - 1
-    //       : comment.likes + 1;
-    //     comment.isLiked = !comment.isLiked;
-    //     comment.isLikeLoading = false;
-       
-    //   })
-
-    const likeComment = (index) => {
-      const comment = comments[index];
-
-        comment.likes = comment.isLiked
-          ? comment.likes - 1
-          : comment.likes + 1;
-        comment.isLiked = !comment.isLiked;
-        comment.isLikeLoading = false;
-      
-
-     
-      if (comment.isLiked) {
-        comment.likesCount--;
-        comment.isLiked = false;
-      } else {
-        comment.likesCount++;
-        comment.isLiked = true;
-      }
     }
 
 
-    // ФУНКЦИЯ РЕДАКТИРОВАНИЯ КОММЕНТАРИЯ
-
-    const editComment = (index) => {
-
-      const comment = comments[index];
-
-      if (comment.isEdited) {
-        const newText = document.getElementById(`textarea-${index}`).value;
-        comment.text = newText;
-        comment.isEdited = false;
-      } else {
-
-        comment.isEdited = true;
-      }
-    }
 
 
     renderComments();
 
     //  ОТПРАВЛЕНИЕ ПО КЛИКУ И ПРИ НАЖАТИИ НА ENTER (только пока не понятно чего)
+
+
 
     addButton.addEventListener("click", () => {
 
@@ -262,31 +272,6 @@
 
       }
     });
-
-    //   function errorSolving() {
-
-    //     comments.push({
-    //       name: nameInput.value
-    //         .replaceAll("&", "&amp;")
-    //         .replaceAll("<", "&lt;")
-    //         .replaceAll(">", "&gt;")
-    //         .replaceAll('"', "&quot;"),
-    //       date: current,
-    //       text: commentInput.value
-    //         .replaceAll("&", "&amp;")
-    //         .replaceAll("<", "&lt;")
-    //         .replaceAll(">", "&gt;")
-    //         .replaceAll('"', "&quot;")
-    //         .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-    //         .replaceAll("QUOTE_END", "</div>"),
-    //       isLiked: false,
-    //       likesCount: 0,
-    //     })
-    //     renderComments();
-
-    //     nameInput.value = "";
-    //     commentInput.value = "";
-    //   }
 
 
     // УДАЛЕНИЕ ПОСЛЕДНЕГО КОММЕНТАРИЯ И ОБРАБОТЧИК СОБЫТИЯ
