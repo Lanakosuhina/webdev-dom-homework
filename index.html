@@ -54,6 +54,9 @@
         method: "GET"
       })
         .then((response) => {
+          if (response.status === 500) {
+            throw new Error("Сервер сломался");
+          }
           return response.json()
         })
         .then((responseData) => {
@@ -71,11 +74,21 @@
               isLikeLoading: false
             };
           });
-          console.log(comments);
+          return comments;
+        })
+        .then(() => {
           renderComments();
           addLoader.style.display = 'none';
           document.body.style.overflow = 'visible';
-        });
+        })
+        .catch((error) => {
+          console.warn(error);
+          if (error.message === "Сервер сломался") {
+            alert("Сервер сломался, попробуй позже");
+            return;
+          }
+
+        })
     }
 
     getComments();
@@ -95,10 +108,18 @@
         body: JSON.stringify({
           name: sanitizeHtml(nameInput.value),
           text: sanitizeHtml(commentInput.value),
+          forceError: false
         })
       })
         .then((response) => {
-          return response.json()
+          if (response.status === 400) {
+            throw new Error("Плохой запрос");
+          } else if (response.status === 500) {
+            throw new Error("Сервер сломался");
+          }
+          if (response.status === 201) {
+            return response.json()
+          }
         })
         .then((responseData) => {
           return [nameInput.value, commentInput.value]
@@ -110,9 +131,29 @@
         .then(() => {
           nameInput.value = "";
           commentInput.value = "";
-                  })
+        })
         .then(() => {
           getComments();
+        })
+        .catch((error) => {
+          console.warn(error);
+          if (error.message === "Сервер сломался") {
+            alert("Сервер сломался, попробуй позже");
+            return;
+          } else if (error.message === "Плохой запрос") {
+            alert("В поле должны содержаться хотя бы 3 символа");
+            nameInput.classList.add("error");
+            commentInput.classList.add("error");
+            setTimeout(() => {
+              nameInput.classList.remove("error");
+              commentInput.classList.remove("error");
+            }, 2000);
+            return;
+          }
+        })
+        .finally(() => {
+          addButton.disabled = false;
+          addButton.textContent = 'Написать'
         })
 
       renderComments();
@@ -150,9 +191,9 @@
       commentSection.innerHTML = commentsHtml;
 
 
-      likeComment();     
+      likeComment();
       answerCommentListener();
-      editComment();    
+      editComment();
 
     }
 
@@ -160,46 +201,46 @@
 
 
     function delay(interval = 300) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, interval);
-    });
-  }
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, interval);
+      });
+    }
 
-    const likeComment = () => { 
+    const likeComment = () => {
       const likeButtons = document.querySelectorAll('.like-button'); // находим кнопки лайков 
-      likeButtons.forEach((likeButton, index) => {  
-        likeButton.addEventListener('click', (event) => { 
+      likeButtons.forEach((likeButton, index) => {
+        likeButton.addEventListener('click', (event) => {
           event.stopPropagation(); // Чтобы не срабатывали одновременно другие функции 
- 
-          if (comments[index].isLikeLoading) return; // если уже идет загрузка, то ничего не делаем
- 
-          comments[index].isLikeLoading = true; // устанавливаем флаг загрузки
- 
+
+          const comment = comments[index];
+          comment.isLikeLoading = true; // устанавливаем флаг загрузки
+
           delay(2000).then(() => { // имитируем задержку загрузки
-            const comment = comments[index];
-            comment.likes = comment.isLiked 
-            ? comment.likes - 1 
-            : comment.likes + 1; // изменяем количество лайков
-            comment.isLiked = !comment.isLiked; // меняем флаг лайка
+            if (comment.isLikeLoading) {
+              comment.isLiked = !comment.isLiked; // меняем флаг лайка
+              comment.likesCount = comment.isLiked
+                ? comment.likesCount + 1
+                : comment.likesCount - 1; // изменяем количество лайков
+            }
             comment.isLikeLoading = false; // снимаем флаг загрузки
             renderComments(); // перерисовываем комментарии
-          }); 
- 
-          const comment = comments[index];
-          if (comment.isLiked) { // если уже лайкнули, то убираем лайк
-            comment.likesCount--;
-            comment.isLiked = false;
-          } else { // иначе добавляем лайк
-            if (comment.likesCount === 0) 
-            comment.likesCount++; // если лайков не было, то увеличиваем счетчик
-            comment.isLiked = true;
-          } 
-          renderComments(); // перерисовываем комментарии
-        }); 
-      }); 
-    } 
+          });
+        });
+
+        //   delay(2000).then(() => { // имитируем задержку загрузки
+        //     const comment = comments[index];
+        //     comment.likesCount = comment.isLiked
+        //       ? comment.likesCount - 1
+        //       : comment.likesCount + 1; // изменяем количество лайков
+        //     comment.isLiked = !comment.isLiked; // меняем флаг лайка
+        //     comment.isLikeLoading = false; // снимаем флаг загрузки
+        //     renderComments(); // перерисовываем комментарии
+        //   });
+        // });
+      })
+    }
 
     // ФУНКЦИЯ ОТВЕТА НА КОММЕНТАРИЙ И ЕЕ ВЫЗОВ
     const answerCommentListener = () => {

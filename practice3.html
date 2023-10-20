@@ -124,11 +124,19 @@ const postAndRenderTasks = () => {
         .then(() => {
           buttonElement.disabled = false;
           buttonElement.textContent = "Добавить";
-        });
+          textInputElement.value = "";
+        })
+        .catch((error) => {
+          buttonElement.disabled = false;
+          buttonElement.textContent = "Добавить";
+          alert("Кажестся что-то пошло не так, попробой позже");
+          // todo: отправлять в систему сбора ошибок
+          console.warn(error);
+        })
 
       renderTasks();
 
-      textInputElement.value = "";
+     
     }
 })
 
