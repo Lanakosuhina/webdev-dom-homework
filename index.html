@@ -43,6 +43,7 @@
     const current = new Date().toLocaleString();
     const likeNumber = document.querySelector(".likes-counter");
     const addLoader = document.querySelector(".mask");
+    const addForm = document.querySelector(".add-form");
 
 
     addLoader.style.display = 'blok';
@@ -108,7 +109,7 @@
         body: JSON.stringify({
           name: sanitizeHtml(nameInput.value),
           text: sanitizeHtml(commentInput.value),
-          forceError: false
+          forceError: true
         })
       })
         .then((response) => {
@@ -138,7 +139,9 @@
         .catch((error) => {
           console.warn(error);
           if (error.message === "Сервер сломался") {
-            alert("Сервер сломался, попробуй позже");
+            alert("Сервер сломался, попробуй перезагрузить страницу позже");
+            // addForm.style.display = 'none';
+            addButton.disabled = true;
             return;
           } else if (error.message === "Плохой запрос") {
             alert("В поле должны содержаться хотя бы 3 символа");
@@ -152,6 +155,7 @@
           }
         })
         .finally(() => {
+          // addForm.style.display = 'blok';
           addButton.disabled = false;
           addButton.textContent = 'Написать'
         })
@@ -229,17 +233,6 @@
             renderComments(); // перерисовываем комментарии
           });
         });
-
-        //   delay(2000).then(() => { // имитируем задержку загрузки
-        //     const comment = comments[index];
-        //     comment.likesCount = comment.isLiked
-        //       ? comment.likesCount - 1
-        //       : comment.likesCount + 1; // изменяем количество лайков
-        //     comment.isLiked = !comment.isLiked; // меняем флаг лайка
-        //     comment.isLikeLoading = false; // снимаем флаг загрузки
-        //     renderComments(); // перерисовываем комментарии
-        //   });
-        // });
       })
     }
 
@@ -319,13 +312,26 @@
     // УДАЛЕНИЕ ПОСЛЕДНЕГО КОММЕНТАРИЯ И ОБРАБОТЧИК СОБЫТИЯ
     const deleteButtonsListeners = () => {
       deleteButton.addEventListener("click", () => {
-        const lastCommentIndex = comments.length - 1;
-        comments.splice(lastCommentIndex, 1);
-        renderComments();
+
+        fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {
+          method: "DELETE",
+        })
+          .then((response) => {
+            return response.json();
+          })
+          .then(() => {
+            const lastCommentIndex = comments.length - 1;
+            comments.splice(lastCommentIndex, 1);
+          })
+          renderComments();
       });
     }
 
     deleteButtonsListeners();
+
+
+    //    const id = deleteButton.dataset.id;
+
 
     //  ФУНКЦИЯ ОТКЛЮЧЕНИЯ КНОПКИ И ОБРАБОТЧИК СОБЫТИЯ НА INPUTы
 
