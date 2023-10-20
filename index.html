@@ -169,6 +169,7 @@
     const renderComments = () => {
       const commentsHtml = comments
         .map((comment, index) => {
+          console.log(comment.isLikeLoading);
           return `<li class="comment" id="comment" data-index="${index}">
           <div class="comment-header">
             <div>${comment.name}</div>
@@ -216,7 +217,7 @@
 
           const comment = comments[index];
           comment.isLikeLoading = true; // устанавливаем флаг загрузки
-
+          renderComments();
           delay(2000).then(() => { // имитируем задержку загрузки
             if (comment.isLikeLoading) {
               comment.isLiked = !comment.isLiked; // меняем флаг лайка
