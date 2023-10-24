@@ -1,3 +1,6 @@
+import { likeComment, answerCommentListener, editComment } from "./additional.js";
+
+
 
 export function renderComments({ comments }) {
     let commentSection = document.querySelector(".comments");
@@ -10,7 +13,7 @@ export function renderComments({ comments }) {
     <div>${comment.name}</div>
     <div>${comment.date}</div>
   </div>
-  <div class="comment-body">
+  <div class="comment-body" data-index="${index}">
     ${comment.isEdited ? `<textarea id="textarea-${index}">${comment.text}</textarea>` : `<div class="comment-text">${comment.text}</div>`}
   </div>
   <div class="comment-footer">
@@ -26,13 +29,8 @@ export function renderComments({ comments }) {
 
     commentSection.innerHTML = commentsHtml;
 
-
-    likeComment();
-    answerCommentListener();
-    editComment();
-
-
-
-    
+    likeComment(comments);
+    answerCommentListener(comments);
+    editComment(comments);
 
 }

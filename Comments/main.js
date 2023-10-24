@@ -1,19 +1,14 @@
 import { getComments, commentPost } from "./API.js";
 import { renderComments } from "./renderComments.js";
+import { nameInput, commentInput, addButton } from "./const.js"
+export let comments = []
 
-
-"use strict";
-
-let nameInput = document.querySelector(".add-form-name");
-let commentInput = document.querySelector(".add-form-text");
-let addButton = document.querySelector(".add-form-button");
 const deleteButton = document.querySelector(".delete-form-button");
-const newComment = document.querySelector(".comment-header");
-const current = new Date().toLocaleString();
-const likeNumber = document.querySelector(".likes-counter");
+// const newComment = document.querySelector(".comment-header");
+// const current = new Date().toLocaleString();
+// const likeNumber = document.querySelector(".likes-counter");
 const addLoader = document.querySelector(".mask");
-const addForm = document.querySelector(".add-form");
-let comments = []
+// const addForm = document.querySelector(".add-form");
 
 addLoader.style.display = 'blok';
 document.body.style.overflow = 'hidden';
@@ -104,105 +99,13 @@ addButton.addEventListener("click", (event) => {
             addButton.textContent = 'Написать'
         })
 
-    renderComments();
+    renderComments({ comments });
 
 });
 
+renderComments({ comments });
 
 
-renderComments();
-
-// ФУНКЦИЯ ДЛЯ ДОБАВЛЕНИЯ ЛАЙКА 
-
-
-function delay(interval = 300) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve();
-        }, interval);
-    });
-}
-
-const likeComment = () => {
-    const likeButtons = document.querySelectorAll('.like-button'); // находим кнопки лайков 
-    likeButtons.forEach((likeButton, index) => {
-        likeButton.addEventListener('click', (event) => {
-            event.stopPropagation(); // Чтобы не срабатывали одновременно другие функции 
-
-            const comment = comments[index];
-            comment.isLikeLoading = true; // устанавливаем флаг загрузки
-            renderComments();
-            delay(2000).then(() => { // имитируем задержку загрузки
-                if (comment.isLikeLoading) {
-                    comment.isLiked = !comment.isLiked; // меняем флаг лайка
-                    comment.likesCount = comment.isLiked
-                        ? comment.likesCount + 1
-                        : comment.likesCount - 1; // изменяем количество лайков
-                }
-                comment.isLikeLoading = false; // снимаем флаг загрузки
-                renderComments(); // перерисовываем комментарии
-            });
-        });
-    })
-}
-
-// ФУНКЦИЯ ОТВЕТА НА КОММЕНТАРИЙ И ЕЕ ВЫЗОВ
-const answerCommentListener = () => {
-    const commentsElement = document.querySelectorAll(".comment");
-
-    for (const commentElement of commentsElement) {
-        commentElement.addEventListener("click", () => {
-            const index = commentElement.dataset.index;
-            if (comments[index].isEdited) return;
-
-            let commentInput = document.querySelector(".add-form-text");
-            commentInput.value = `QUOTE_BEGIN ${comments[index].name}: \n ${comments[index].text} QUOTE_END`;
-            renderComments();
-        })
-    }
-}
-
-// ФУНКЦИЯ ЗАМЕНЫ СИМВОЛОВ
-
-const sanitizeHtml = (htmlString) => {
-    return htmlString
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("QUOTE_BEGIN", "<div class='quote'>")
-        .replaceAll("QUOTE_END", "</div>")
-};
-
-
-// ФУНКЦИЯ РЕДАКТИРОВАНИЯ КОММЕНТАРИЯ
-
-const editComment = () => {
-    const editButtonList = document.querySelectorAll('.edit-button');
-
-    editButtonList.forEach((editButton, index) => {
-        editButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-
-            const comment = comments[index];
-            const newText = document.getElementById(`textarea - ${index}`).value;
-
-            if (comment.isEdited) {
-                comment.text = newText;
-                comment.isEdited = false;
-            } else {
-                comment.isEdited = true;
-            }
-
-            renderComments();
-        });
-    });
-}
-
-
-
-
-renderComments();
 
 //  ОТПРАВЛЕНИЕ ПО КЛИКУ И ПРИ НАЖАТИИ НА ENTER (только пока не понятно чего)
 
@@ -225,7 +128,7 @@ const deleteButtonsListeners = () => {
         const lastCommentIndex = comments.length - 1;
         comments.splice(lastCommentIndex, 1);
 
-        renderComments();
+        renderComments({ comments });
     });
 }
 
