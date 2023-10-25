@@ -1,7 +1,6 @@
 import { sanitizeHtml } from "./utils.js";
 import { nameInput, commentInput } from "./const.js"
 
-
 export function getComments() {
    
 return fetch("https://wedev-api.sky.pro/api/v1/sveta-kosuhina/comments", {

@@ -3,12 +3,8 @@ import { renderComments } from "./renderComments.js";
 import { nameInput, commentInput, addButton } from "./const.js"
 export let comments = []
 
-const deleteButton = document.querySelector(".delete-form-button");
-// const newComment = document.querySelector(".comment-header");
-// const current = new Date().toLocaleString();
-// const likeNumber = document.querySelector(".likes-counter");
 const addLoader = document.querySelector(".mask");
-// const addForm = document.querySelector(".add-form");
+
 
 addLoader.style.display = 'blok';
 document.body.style.overflow = 'hidden';
@@ -122,40 +118,4 @@ addButton.addEventListener('keyup', function (event) {
 });
 
 
-// УДАЛЕНИЕ ПОСЛЕДНЕГО КОММЕНТАРИЯ И ОБРАБОТЧИК СОБЫТИЯ
-const deleteButtonsListeners = () => {
-    deleteButton.addEventListener("click", () => {
-        const lastCommentIndex = comments.length - 1;
-        comments.splice(lastCommentIndex, 1);
-
-        renderComments({ comments });
-    });
-}
-
-deleteButtonsListeners();
-
-
-//    const id = deleteButton.dataset.id;
-
-
-//  ФУНКЦИЯ ОТКЛЮЧЕНИЯ КНОПКИ И ОБРАБОТЧИК СОБЫТИЯ НА INPUTы
-
-nameInput.addEventListener('input', () => {
-    turnOnOff();
-});
-
-commentInput.addEventListener('input', () => {
-    turnOnOff();
-});
-
-function turnOnOff() {
-    let username = nameInput.value;
-    let comment = commentInput.value;
-
-    if (username && comment) {
-        document.querySelector(".add-form-button").disabled = false;
-    } else {
-        document.querySelector(".add-form-button").disabled = true;
-    }
-}
 console.log("It works!");

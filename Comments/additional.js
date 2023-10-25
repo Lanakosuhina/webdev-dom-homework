@@ -1,5 +1,6 @@
 import { delay } from "./utils.js"
 import { renderComments } from "./renderComments.js";
+import { nameInput, commentInput } from "./const.js";
 
 // ФУНКЦИЯ ДЛЯ ДОБАВЛЕНИЯ ЛАЙКА 
 
@@ -9,7 +10,7 @@ export const likeComment = (comments) => {
         likeButton.addEventListener('click', (event) => {
             event.stopPropagation(); // Чтобы не срабатывали одновременно другие функции 
 
-            const comment = comments[index]; 
+            const comment = comments[index];
 
             comment.isLikeLoading = true; // устанавливаем флаг загрузки
             renderComments({ comments });
@@ -54,9 +55,9 @@ export const editComment = (comments) => {
         editButton.addEventListener('click', (event) => {
             event.stopPropagation();
 
-            const comment = comments[index];       
+            const comment = comments[index];
             const newText = document.getElementById(`textarea - ${index}`).value;
-    
+
 
             if (comment.isEdited) {
                 comment.text = newText;
@@ -68,4 +69,41 @@ export const editComment = (comments) => {
             renderComments({ comments });
         });
     });
+}
+
+// УДАЛЕНИЕ ПОСЛЕДНЕГО КОММЕНТАРИЯ И ОБРАБОТЧИК СОБЫТИЯ
+const deleteButton = document.querySelector(".delete-form-button");
+//    const id = deleteButton.dataset.id;
+
+
+const deleteButtonsListeners = (comments) => {
+    deleteButton.addEventListener("click", () => {
+        const lastCommentIndex = comments.length - 1;
+        comments.splice(lastCommentIndex, 1);  
+
+        renderComments({ comments });
+    });
+}
+
+deleteButtonsListeners(comments);
+
+//  ФУНКЦИЯ ОТКЛЮЧЕНИЯ КНОПКИ И ОБРАБОТЧИК СОБЫТИЯ НА INPUTы
+
+nameInput.addEventListener('input', () => {
+    turnOnOff();
+});
+
+commentInput.addEventListener('input', () => {
+    turnOnOff();
+});
+
+function turnOnOff() {
+    let username = nameInput.value;
+    let comment = commentInput.value;
+
+    if (username && comment) {
+        document.querySelector(".add-form-button").disabled = false;
+    } else {
+        document.querySelector(".add-form-button").disabled = true;
+    }
 }
