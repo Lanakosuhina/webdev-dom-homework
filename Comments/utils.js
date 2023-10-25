@@ -1,5 +1,6 @@
 import { addButton } from "./const.js";
 import { renderComments } from "./renderComments.js";
+import { comments } from "./main.js";
 // ФУНКЦИЯ ЗАМЕНЫ СИМВОЛОВ
 
 export const sanitizeHtml = (htmlString) => {
@@ -20,7 +21,7 @@ export function delay(interval = 300) {
     });
 }
 
-//  ОТПРАВЛЕНИЕ ПО КЛИКУ И ПРИ НАЖАТИИ НА ENTER (только пока не понятно чего)
+//  ОТПРАВЛЕНИЕ ПО КЛИКУ И ПРИ НАЖАТИИ НА ENTER
 
 addButton.addEventListener("click", () => {
     renderComments({ comments });

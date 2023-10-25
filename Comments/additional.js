@@ -1,6 +1,7 @@
 import { delay } from "./utils.js"
 import { renderComments } from "./renderComments.js";
 import { nameInput, commentInput } from "./const.js";
+import { comments } from "./main.js";
 
 // ФУНКЦИЯ ДЛЯ ДОБАВЛЕНИЯ ЛАЙКА 
 
@@ -56,10 +57,8 @@ export const editComment = (comments) => {
             event.stopPropagation();
 
             const comment = comments[index];
-            const newText = document.getElementById(`textarea - ${index}`).value;
-
-
             if (comment.isEdited) {
+                const newText = document.getElementById(`textarea-${index}`).value;
                 comment.text = newText;
                 comment.isEdited = false;
             } else {
@@ -85,7 +84,7 @@ const deleteButtonsListeners = (comments) => {
     });
 }
 
-deleteButtonsListeners(comments);
+// deleteButtonsListeners(comments);
 
 //  ФУНКЦИЯ ОТКЛЮЧЕНИЯ КНОПКИ И ОБРАБОТЧИК СОБЫТИЯ НА INPUTы
 

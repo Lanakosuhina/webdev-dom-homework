@@ -7,7 +7,6 @@ export function renderComments({ comments }) {
 
     const commentsHtml = comments
         .map((comment, index) => {
-            console.log(comment.isLikeLoading);
             return `<li class="comment" id="comment" data-index="${index}">
   <div class="comment-header">
     <div>${comment.name}</div>
