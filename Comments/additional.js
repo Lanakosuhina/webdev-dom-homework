@@ -1,7 +1,5 @@
 import { delay } from "./utils.js"
 import { renderComments } from "./renderComments.js";
-import { nameInput, commentInput } from "./const.js";
-import { comments } from "./main.js";
 
 // ФУНКЦИЯ ДЛЯ ДОБАВЛЕНИЯ ЛАЙКА 
 
@@ -88,21 +86,3 @@ const deleteButtonsListeners = (comments) => {
 
 //  ФУНКЦИЯ ОТКЛЮЧЕНИЯ КНОПКИ И ОБРАБОТЧИК СОБЫТИЯ НА INPUTы
 
-nameInput.addEventListener('input', () => {
-    turnOnOff();
-});
-
-commentInput.addEventListener('input', () => {
-    turnOnOff();
-});
-
-function turnOnOff() {
-    let username = nameInput.value;
-    let comment = commentInput.value;
-
-    if (username && comment) {
-        document.querySelector(".add-form-button").disabled = false;
-    } else {
-        document.querySelector(".add-form-button").disabled = true;
-    }
-}

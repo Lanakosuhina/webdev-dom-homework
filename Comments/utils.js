@@ -21,14 +21,3 @@ export function delay(interval = 300) {
     });
 }
 
-//  ОТПРАВЛЕНИЕ ПО КЛИКУ И ПРИ НАЖАТИИ НА ENTER
-
-addButton.addEventListener("click", () => {
-    renderComments({ comments });
-});
-
-addButton.addEventListener('keyup', function (event) {
-    if (event.which === 13) {
-        renderComments({ comments });
-    }
-});

@@ -1,15 +1,13 @@
 import { getComments, commentPost } from "./API.js";
 import { renderComments } from "./renderComments.js";
-import { nameInput, commentInput, addButton } from "./const.js"
+import { addLoader } from "./const.js";
+import { renderLogin } from "./renderLogin.js";
 export let comments = []
 
-const addLoader = document.querySelector(".mask");
+let isLoading = true
 
 
-addLoader.style.display = 'blok';
-document.body.style.overflow = 'hidden';
-
-const getCommentation = () => {
+export const getCommentation = () => {
     getComments()
         .then((responseData) => {
             comments = responseData.comments.map((comment) => {
@@ -29,9 +27,8 @@ const getCommentation = () => {
             return comments;
         })
         .then(() => {
-            renderComments({ comments });
-            addLoader.style.display = 'none';
-            document.body.style.overflow = 'visible';
+                        renderComments({ comments });
+
         })
         .catch((error) => {
             console.warn(error);
@@ -43,79 +40,12 @@ const getCommentation = () => {
         })
 }
 
+renderLogin();
 getCommentation();
 
-addButton.addEventListener("click", (event) => {
-    if (nameInput.value === "" && commentInput.value === "") {
-        nameInput.classList.add("error");
-        commentInput.classList.add("error");
-        return;
-    }
-    addButton.disabled = true;
-    addButton.textContent = 'Комментарий добавляется...';
 
-    event.stopPropagation();
-    commentPost()
-        .then((responseData) => {
-            return [nameInput.value, commentInput.value]
-        })
-        .then(() => {
-            addButton.disabled = false;
-            addButton.textContent = 'Написать'
-        })
-        .then(() => {
-            nameInput.value = "";
-            commentInput.value = "";
-        })
-        .then(() => {
-            getCommentation();
-        })
-        .catch((error) => {
-            console.warn(error);
-            if (error.message === "Сервер сломался") {
-                alert("Сервер сломался, попробуй перезагрузить страницу позже");
-                // addForm.style.display = 'none';
-                addButton.disabled = true;
-                return;
-            } else if (error.message === "Плохой запрос") {
-                alert("В поле должны содержаться хотя бы 3 символа");
-                nameInput.classList.add("error");
-                commentInput.classList.add("error");
-                setTimeout(() => {
-                    nameInput.classList.remove("error");
-                    commentInput.classList.remove("error");
-                }, 2000);
-                return;
-            }
-            alert("Кажется, у вас сломался интернет, попробуйте позже");
-        })
-        .finally(() => {
-            // addForm.style.display = 'blok';
-            addButton.disabled = false;
-            addButton.textContent = 'Написать'
-        })
-
-    renderComments({ comments });
-
-});
-
-renderComments({ comments });
-
-
-
-//  ОТПРАВЛЕНИЕ ПО КЛИКУ И ПРИ НАЖАТИИ НА ENTER (только пока не понятно чего)
-
-
-
-addButton.addEventListener("click", () => {
-
-});
-
-addButton.addEventListener('keyup', function (event) {
-    if (event.which === 13) {
-
-    }
-});
-
-
+// addLoader.style.display = 'block';
+// document.body.style.overflow = 'hidden';
+// addLoader.style.display = 'none';
+// document.body.style.overflow = 'visible';
 console.log("It works!");

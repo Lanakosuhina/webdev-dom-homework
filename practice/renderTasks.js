@@ -1,24 +1,29 @@
 // Модуль renderTasks.js
 import { deleteTodo, postTodo } from "./api.js";
+import { formatDateToRu,formatDateToUs } from "../lib/formatDate/formatDate.js";
 
 const listElement = document.getElementById("list");
 
 export const renderTasks = ({ tasks, fetchAndRenderTasks }) => {
   const appElement = document.getElementById("app");
 
+
+  const country = "ru";
   const tasksHtml = tasks
     .map((task) => {
       return `
-      <li class="task">
-        <p class="task-text">
-          ${task.text}
-          <button data-id="${task.id}" class="button delete-button">Удалить</button>
-        </p>
-      </li>`;
+        <li class="task">
+          <p class="task-text">
+            ${task.text} (Создал: ${task.user?.name ?? "Неизвестно"})
+            <button data-id="${task.id
+        }" class="button delete-button">Удалить</button>
+          </p>
+          <p><i>Задача создана: ${country === "ru" ? formatDateToRu(new Date(task.created_at)) : formatDateToUs(new Date(task.created_at))}</i></p>
+          </li>`;
     })
     .join("");
 
-    const appHtml = `
+  const appHtml = `
     <h1>Список задач</h1>
     <ul class="tasks" id="list">${tasksHtml}</ul>
     <br />
@@ -54,30 +59,30 @@ export const renderTasks = ({ tasks, fetchAndRenderTasks }) => {
     });
   }
 
-const buttonElement = document.getElementById("add-button");
-const textInputElement = document.getElementById("text-input");
+  const buttonElement = document.getElementById("add-button");
+  const textInputElement = document.getElementById("text-input");
 
 
-buttonElement.addEventListener("click", () => {
-  if (textInputElement.value === "") {
-    return;
-  }
+  buttonElement.addEventListener("click", () => {
+    if (textInputElement.value === "") {
+      return;
+    }
 
-  buttonElement.disabled = true;
-  buttonElement.textContent = "Элемент добавлятся...";
+    buttonElement.disabled = true;
+    buttonElement.textContent = "Элемент добавлятся...";
 
-  postTodo({
-    text: textInputElement.value,
-  })
-    .then(() => {
-      return fetchAndRenderTasks();
+    postTodo({
+      text: textInputElement.value,
     })
-    .then(() => {
-      buttonElement.disabled = false;
-      buttonElement.textContent = "Добавить";
-      textInputElement.value = "";
-    });
+      .then(() => {
+        return fetchAndRenderTasks();
+      })
+      .then(() => {
+        buttonElement.disabled = false;
+        buttonElement.textContent = "Добавить";
+        textInputElement.value = "";
+      });
 
-  renderTasks({ tasks, fetchAndRenderTasks });
-});
+    renderTasks({ tasks, fetchAndRenderTasks });
+  });
 };

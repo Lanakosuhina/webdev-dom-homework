@@ -104,7 +104,7 @@ body {
 
   .add-form {
     padding: 20px;
-    margin-top: 90px;
+    margin-top: 140px;
     display: flex;
     flex-direction: column;
   }
@@ -161,7 +161,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 60px;
  
 }
 .comments-loading {
@@ -259,4 +258,9 @@ body {
     font-family: Helvetica;
     color: #ffffff;
     font-size: 20px;
+  }
+  a {
+    text-decoration: underline;
+    font-family: Helvetica;
+    color: #ffffff;
   }
