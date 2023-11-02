@@ -1,4 +1,5 @@
 import { login, setToken, token } from "./api.js";
+import _ from 'lodash';
 
 
 export const renderLogin = ({fetchAndRenderTasks}) => {
@@ -31,11 +32,11 @@ buttonElement.addEventListener("click", () => {
     login({
         login: loginInputElement.value,
         password: passwordInputElement.value,
-    }).then((responseData) => {
-    
-        console.log(token);
+        name: _.capitalize(name),    
+   // name: name[0].toUpperCase() + name.slice(1).toLowerCase(),
+	// Приводим первый символ к верхнему регистру + остальную часть к нижнему
+    }).then((responseData) => {        
        setToken(responseData.user.token)
-        console.log(token);
     })
     .then(() => {
         fetchAndRenderTasks();
