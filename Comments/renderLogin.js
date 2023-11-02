@@ -8,7 +8,7 @@ export const renderLogin = () => {
   <div class="container">
   <div class="login-form">
       <p class="login-text">Форма входа</p>
-      <form id="login-password" action="#" method="post" autocomplete="on">
+      <form id="login-password" action="#" autocomplete="on">
           <input type="text" class="input" id="login-input" placeholder="Введите ваш логин" />
           <input type="password" class="input" id="password-input" placeholder="Введите ваш пароль" />
           <button id="login-button" class="login-button">Войти</button>
