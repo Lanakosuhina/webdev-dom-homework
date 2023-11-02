@@ -1,10 +1,9 @@
-import { appElement } from "./const.js";
-import { login, setToken } from "./API.js";
-import { getCommentation } from "./main.js";
-
+import { appElement } from './const.js'
+import { login, setToken } from './API.js'
+import { getCommentation } from './main.js'
 
 export const renderLogin = () => {
-  const loginHtml = `
+    const loginHtml = `
   <div class="container">
   <div class="login-form">
       <p class="login-text">Форма входа</p>
@@ -16,27 +15,24 @@ export const renderLogin = () => {
 </form>
   </div>
 </div>
-     `;
+     `
 
-  appElement.innerHTML = loginHtml;
+    appElement.innerHTML = loginHtml
 
-  const buttonElement = document.getElementById("login-button");
-  const loginInputElement = document.getElementById("login-input");
-  const passwordInputElement = document.getElementById("password-input");
+    const buttonElement = document.getElementById('login-button')
+    const loginInputElement = document.getElementById('login-input')
+    const passwordInputElement = document.getElementById('password-input')
 
-  buttonElement.addEventListener("click", () => {
-
-
-    login({
-      login: loginInputElement.value,
-      password: passwordInputElement.value,
+    buttonElement.addEventListener('click', () => {
+        login({
+            login: loginInputElement.value,
+            password: passwordInputElement.value,
+        })
+            .then((responseData) => {
+                setToken(responseData.user.token)
+            })
+            .then(() => {
+                getCommentation()
+            })
     })
-      .then((responseData) => {
-        setToken(responseData.user.token);
-      })
-      .then(() => {
-        getCommentation();
-      });
-  });
-};
-
+}
