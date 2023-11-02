@@ -86,3 +86,13 @@ const deleteButtonsListeners = (comments) => {
 
 //  ФУНКЦИЯ ОТКЛЮЧЕНИЯ КНОПКИ И ОБРАБОТЧИК СОБЫТИЯ НА INPUTы
 
+export function turnOnOff() {
+    let username = nameInput.value;
+    let comment = commentInput.value;
+
+    if (username && comment) {
+      document.querySelector(".add-form-button").disabled = false;
+    } else {
+      document.querySelector(".add-form-button").disabled = true;
+    }
+  }

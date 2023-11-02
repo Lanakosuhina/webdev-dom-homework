@@ -5,16 +5,17 @@ import { getCommentation } from "./main.js";
 
 export const renderLogin = () => {
   const loginHtml = `
-    <div class="container">
-     <div class="login-form">
-       <p class="login-text">Форма входа</p>
-         <input type="text" class="input" id="login-input" placeholder="Введите ваш логин"/>
-         <input type="password" class="input" id="password-input" placeholder="Введите ваш пароль"/>
-        <button class="login-button" id="login-button">Войти</button>
-      
-      <a href="#" class="register">Зарегистрироваться</a>
-       </div>
-            </div>
+  <div class="container">
+  <div class="login-form">
+      <p class="login-text">Форма входа</p>
+      <form id="login-password" action="#" method="post" autocomplete="on">
+          <input type="text" class="input" id="login-input" placeholder="Введите ваш логин" />
+          <input type="password" class="input" id="password-input" placeholder="Введите ваш пароль" />
+          <button id="login-button" class="login-button">Войти</button>
+          <a href="#" class="register">Зарегистрироваться</a>
+</form>
+  </div>
+</div>
      `;
 
   appElement.innerHTML = loginHtml;
@@ -23,9 +24,8 @@ export const renderLogin = () => {
   const loginInputElement = document.getElementById("login-input");
   const passwordInputElement = document.getElementById("password-input");
 
-  
   buttonElement.addEventListener("click", () => {
-   
+
 
     login({
       login: loginInputElement.value,

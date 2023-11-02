@@ -224,9 +224,13 @@ body {
   .login-form {
     padding: 20px;
     margin-top: 90px;
+  }
+
+  #login-password {
     display: flex;
     flex-direction: column;
   }
+
   .add-login,
   .add-password {
     margin-top: 12px;

@@ -4,7 +4,7 @@ import { addLoader } from "./const.js";
 import { renderLogin } from "./renderLogin.js";
 export let comments = []
 
-let isLoading = true
+export let isLoading = true;
 
 
 export const getCommentation = () => {
@@ -27,7 +27,8 @@ export const getCommentation = () => {
             return comments;
         })
         .then(() => {
-                        renderComments({ comments });
+        isLoading = false;
+        renderComments({ comments, isLoading });
 
         })
         .catch((error) => {
